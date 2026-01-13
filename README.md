@@ -13,6 +13,8 @@ The script writes files into the output folder (default: `print_files/`):
 - `output/demo.gif` → example animation preview (already included)
 
 > There is a GIF preview inside the output folder: `output/ezgif-36eac992c652876e.gif`
+> ![Demo animation](output/ezgif-36eac992c652876e.gif)
+
 
 ## Requirements
 
