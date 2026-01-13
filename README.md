@@ -14,6 +14,9 @@ The script writes files into the output folder (default: `print_files/`):
 
 > ![Demo animation](running/ezgif-36eac992c652876e.gif)
 
+Tips
+
+Make sure your printer is set to no scaling (100%).
 
 ## Requirements
 
@@ -21,3 +24,4 @@ Install dependencies:
 
 ```bash
 pip install -r requirements.txt
+
