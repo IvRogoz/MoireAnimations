@@ -6,7 +6,7 @@ You print the **base image** on paper, print the **barrier mask** on a transpare
 
 ## Output Files
 
-The script writes files into the output folder (default: `print_files/`):
+The script writes files into the output folder (default: `output/`):
 
 - `interlaced_base.png` → print on **paper**
 - `barrier_mask.png` → print on **transparent film** (black bars block light, slits are transparent)
