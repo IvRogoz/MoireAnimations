@@ -11,7 +11,7 @@ The script writes files into the output folder (default: `output/`):
 - `interlaced_base.png` → print on **paper**
 - `barrier_mask.png` → print on **transparent film** (black bars block light, slits are transparent)
 
-> ![Demo animation](running/ezgif-36eac992c652876e.gif)
+> ![Demo animation](running/ezgif-3178bb43e9693af1.gif)
 
 Tips
 
