@@ -6,19 +6,39 @@ the transparency mask rotates.
 The result is similar in principle to a slit scanimation sheet, but the stripes
 are angular wedges around the center instead of vertical columns.
 
-## Generate
+## Original Radial Scanline Output
 
-```powershell
-python .\radial_numbers\radial_moire_numbers.py
+The original radial scanline/repeating output is kept in:
+
+```text
+output/
 ```
 
-Outputs are written to `radial_numbers/output`:
+It contains:
+
+- `radial_interlaced_base.png`
+- `radial_barrier_mask.png`
+- `previews/reveal_01.png` through `previews/reveal_12.png`
+
+## Generate Encoder Ring Clock
+
+```powershell
+python .\radial_numbers\radial_moire_numbers.py --mode encoder-ring-clock --preview-angles-deg 0,1,29,30,31 --output radial_numbers/output_encoder_ring_clock
+```
+
+Final outputs are written to `radial_numbers/output_encoder_ring_clock`:
 
 - `radial_interlaced_base.png`: print on paper
 - `radial_barrier_mask.png`: print on transparency
 - `previews/reveal_01.png` through `previews/reveal_12.png`: simulated reveal states
+- `previews/contact_sheet.png`: all 12 reveal states in one image
+- `previews/angle_diagnostics.png`: 0, 1, 29, 30, and 31 degree stability check
+- `rotation_360_slow_in_pause_numbers.gif`: 360 degree encoder-ring animation
+- `rotation_360_slow_in_pause_numbers_inverted.gif`: inverted 360 degree encoder-ring animation
 
-The default is the visually stable repeating radial path.
+![Encoder ring animation](output_encoder_ring_clock/rotation_360_slow_in_pause_numbers.gif)
+
+![12-number contact sheet](output_encoder_ring_clock/previews/contact_sheet.png)
 
 ## Stable Repeating Path
 
@@ -121,10 +141,28 @@ still accepted as an alias for this encoder-ring implementation.
 Useful encoder-ring options:
 
 - `--rings`: number of concentric rings.
-- `--ring-spokes`: transparent encoder segments per ring.
+- `--encoder-angular-cells`: angular cell count. Must be divisible by `--numbers`.
 - `--clock-hold-deg`: angular stability window around each 30-degree target.
-- `--clock-slit-angle-deg`: angular width of the transparent mask slit.
 - `--preview-angles-deg`: extra preview angles for checking stability.
+- `--invert`: invert base, mask display colors, and previews while preserving
+  mask transparency.
+
+## Encoder Ring Animation
+
+The current checked-in animation is:
+
+```text
+output_encoder_ring_clock/rotation_360_slow_in_pause_numbers.gif
+```
+
+It rotates through all 12 numbers, slows down before each 30-degree reveal
+position, and pauses for one second on each number.
+
+The inverted version is:
+
+```text
+output_encoder_ring_clock/rotation_360_slow_in_pause_numbers_inverted.gif
+```
 
 Use `--periods 1` only if you specifically want a 30-degree step between numbers;
 the reveal will be much coarser because each number gets only one large wedge.

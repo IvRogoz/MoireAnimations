@@ -1,35 +1,73 @@
 # Moire Animations
 
-Scripts and generated assets for moire animation experiments.
+Printable moire animation generators and generated reference assets.
 
-## Slit Scanimation Print Generator
+This repo has two separate tools:
 
-`main.py` generates two printable files used to create a classic
-barrier-grid / slit moire animation.
+- `main.py`: linear slit scanimation / barrier-grid generator.
+- `radial_numbers/radial_moire_numbers.py`: radial number-clock generator.
 
-Print the base image on paper, print the barrier mask on transparency, then
-slide the transparency across the base to reveal each frame one at a time.
+## Slit Scanimation
 
-Output files are written into `output/` by default:
+`main.py` creates a classic barrier-grid animation from a folder of source
+frames. It writes:
 
-- `interlaced_base.png`: print on paper
-- `barrier_mask.png`: print on transparent film
+- `output/interlaced_base.png`: print on paper.
+- `output/barrier_mask.png`: print on transparent film.
 
-![Demo animation](running/ezgif-3178bb43e9693af1.gif)
+Example:
 
-Install dependencies:
+```powershell
+python .\main.py --folder running --stripe-mm 1 --output output
+```
+
+Print at 100% scale. Slide the transparency by one stripe width to advance one
+animation frame.
+
+![Slit scanimation demo](running/ezgif-3178bb43e9693af1.gif)
+
+## Radial Number Clock
+
+`radial_numbers/radial_moire_numbers.py` creates a radial moire base and a
+rotating transparency mask. In encoder-ring clock mode, the mask reveals numbers
+`1` through `12` at 30-degree increments, so one full mask rotation acts like a
+12-hour clock.
+
+Generate the final encoder-ring version:
+
+```powershell
+python .\radial_numbers\radial_moire_numbers.py --mode encoder-ring-clock --preview-angles-deg 0,1,29,30,31 --output radial_numbers/output_encoder_ring_clock
+```
+
+Final radial files:
+
+- `radial_numbers/output/`: original radial scanline/repeating output.
+- `radial_numbers/output_encoder_ring_clock/radial_interlaced_base.png`: print on paper.
+- `radial_numbers/output_encoder_ring_clock/radial_barrier_mask.png`: print on transparency.
+- `radial_numbers/output_encoder_ring_clock/previews/contact_sheet.png`: all 12 reveal states.
+- `radial_numbers/output_encoder_ring_clock/previews/angle_diagnostics.png`: stability check at 0, 1, 29, 30, and 31 degrees.
+- `radial_numbers/output_encoder_ring_clock/rotation_360_slow_in_pause_numbers.gif`: encoder-ring animation.
+- `radial_numbers/output_encoder_ring_clock/rotation_360_slow_in_pause_numbers_inverted.gif`: inverted encoder-ring animation.
+
+![Radial encoder ring animation](radial_numbers/output_encoder_ring_clock/rotation_360_slow_in_pause_numbers.gif)
+
+![Radial 12-number contact sheet](radial_numbers/output_encoder_ring_clock/previews/contact_sheet.png)
+
+## Radial Options
+
+Useful options for `radial_moire_numbers.py`:
+
+- `--deadzone-mm`: black center radius; `0` keeps the pattern all the way to the center.
+- `--invert`: invert base, mask display colors, and previews while preserving mask transparency.
+- `--rings`: number of concentric encoder rings.
+- `--encoder-angular-cells`: angular cell count; must be divisible by `--numbers`.
+- `--clock-hold-deg`: angular stability window around each 30-degree target.
+- `--preview-angles-deg`: extra physical mask rotations to render as previews.
+
+More radial details are in `radial_numbers/README.md`.
+
+## Install
 
 ```bash
 pip install -r requirements.txt
 ```
-
-Use 100% printer scaling.
-
-## Radial Number Clock
-
-The `radial_numbers` folder contains a radial moire generator that creates a
-printable base layer and a rotating transparency mask. The encoder-ring clock
-mode reveals numbers `1` through `12` at 30-degree mask increments.
-
-See `radial_numbers/README.md` for generation options, including deadzone,
-invert, stable repeating paths, and encoder-ring clock settings.
