@@ -1,20 +1,6 @@
-"""
-Barrier-grid / slit scanimation generator for printing.
-
-Outputs:
-- interlaced_base.png: print on paper
-- barrier_mask.png: print on transparency
-
-For N frames:
-  slit_width = stripe_width
-  bar_width = (N - 1) * stripe_width
-  period = N * stripe_width
-"""
-
+from PIL import Image, ImageDraw
 import argparse
 from pathlib import Path
-
-from PIL import Image, ImageDraw
 
 
 def mm_to_px(mm: float, dpi: int) -> int:
@@ -30,7 +16,7 @@ def create_barrier_mask_rgba(width, height, stripe_px, n_frames):
     print(f"  Stripe/slit width:   {stripe_px}px")
     print(f"  Opaque bar width:    {bar_px}px")
     print(f"  Period:              {period_px}px")
-    print("Mask canvas:")
+    print(f"Mask canvas:")
     print(f"  Size:                {width} x {height}px")
 
     mask = Image.new("RGBA", (width, height), (0, 0, 0, 0))
@@ -65,25 +51,19 @@ def create_interlaced_base(frames, stripe_px):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Printable scanimation barrier-grid files")
+    parser = argparse.ArgumentParser(description="Printable scanimation (barrier-grid / slit) files")
     parser.add_argument("--folder", required=True, help="Folder with your frames")
     parser.add_argument("--dpi", type=int, default=400)
-    parser.add_argument(
-        "--stripe-mm",
-        type=float,
-        default=1.0,
-        help="Width of one frame stripe / transparent slit in mm.",
-    )
-    parser.add_argument(
-        "--mask-width-mult",
-        type=int,
-        default=4,
-        help="Multiply only the barrier mask width.",
-    )
+
+    parser.add_argument("--stripe-mm", type=float, default=1.0, help="Width of ONE frame stripe / transparent slit (mm). Mask bar is auto: (N-1)*stripe.")
+
+    parser.add_argument("--mask-width-mult", type=int, default=4, help="Multiply ONLY the barrier mask width (e.g. 4 = 4x wider mask)")
+
     parser.add_argument("--output", default="output")
 
     args = parser.parse_args()
 
+    # Load frames
     paths = sorted(Path(args.folder).glob("*.[jpJP][pnPN][gG]*"))
     if not paths:
         print("No images found in folder")
@@ -92,18 +72,21 @@ def main():
     frames = [Image.open(p).convert("RGB") for p in paths]
     w, h = frames[0].size
 
-    for idx, frame in enumerate(frames):
-        if frame.size != (w, h):
-            raise ValueError(f"Frame {paths[idx].name} size {frame.size} != first frame size {(w, h)}")
+    # Ensure all frames match size
+    for idx, f in enumerate(frames):
+        if f.size != (w, h):
+            raise ValueError(f"Frame {paths[idx].name} size {f.size} != first frame size {(w, h)}")
 
     n_frames = len(frames)
     stripe_px = mm_to_px(args.stripe_mm, args.dpi)
 
+    # Base is unchanged size
     base = create_interlaced_base(frames, stripe_px)
 
+    # Mask can be wider
     mask_w = w * max(1, int(args.mask_width_mult))
     mask_h = h
-    mask, _period_px, _slit_px, _bar_px = create_barrier_mask_rgba(mask_w, mask_h, stripe_px, n_frames)
+    mask, period_px, slit_px, bar_px = create_barrier_mask_rgba(mask_w, mask_h, stripe_px, n_frames)
 
     out = Path(args.output)
     out.mkdir(exist_ok=True)
@@ -115,11 +98,11 @@ def main():
     base.save(base_path, dpi=(args.dpi, args.dpi))
 
     print("\nCreated:")
-    print(f"  {base_path}: print on paper, base width = {w}px")
-    print(f"  {mask_path}: print on transparency, mask width = {mask_w}px")
+    print(f"  {base_path}  → print on paper (base width = {w}px)")
+    print(f"  {mask_path}  → print on transparency (mask width = {mask_w}px)")
     print("\nHow it should behave:")
-    print("  Only one frame is visible at a time.")
-    print(f"  Sliding mask by {args.stripe_mm}mm, about {stripe_px}px, switches to next frame.")
+    print(f"  Only ONE frame visible at a time.")
+    print(f"  Sliding mask by {args.stripe_mm}mm (≈ {stripe_px}px) switches to next frame.")
 
 
 if __name__ == "__main__":
